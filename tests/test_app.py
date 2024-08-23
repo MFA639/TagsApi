@@ -1,16 +1,20 @@
 import unittest
-from app import app
+from app import app, model, mlb_classes
 
-class BasicTests(unittest.TestCase):
+class ModelTests(unittest.TestCase):
 
     def setUp(self):
         app.config['TESTING'] = True
         self.app = app.test_client()
 
+    def test_model_loading(self):
+        self.assertIsNotNone(model)
+        self.assertIsNotNone(mlb_classes)
+
     def test_index(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.decode(), "Hello, World!")
+        self.assertEqual(response.data.decode(), "Model loaded successfully!")
 
 if __name__ == "__main__":
     unittest.main()
