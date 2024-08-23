@@ -1,27 +1,107 @@
-voici le code de index.html :   GNU nano 7.2                                                           index.html                                                                     
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Prediction</title>
+    <title>Keyword Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .predictions {
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function submitForm(event) {
+            event.preventDefault();  // Empêche le rechargement de la page
+
+            const text = document.querySelector('textarea[name="text"]').value;
+            const predictionsDiv = document.querySelector('.predictions');
+            const errorDiv = document.querySelector('.error');
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Vérifie s'il y a une erreur
+                if (data.error) {
+                    errorDiv.textContent = data.error;
+                    predictionsDiv.innerHTML = '';  // Vide les prédictions
+                } else {
+                    // Affiche les prédictions
+                    errorDiv.textContent = '';
+                    predictionsDiv.innerHTML = '<h2>Predicted Tags:</h2><ul>' +
+                        Object.entries(data).map(([tag, score]) => `<li>${tag}: ${score}</li>`).join('') +
+                        '</ul>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                predictionsDiv.innerHTML = '';  // Vide les prédictions
+            });
+        }
+    </script>
 </head>
 <body>
-    <h1>Entrer le texte à prédire</h1>
-    <form action="/predict" method="post">
-        <input type="text" name="text" placeholder="Enter text here">
-        <button type="submit">Predict</button>
-    </form>
+    <div class="container">
+        <h1>Keyword Prediction</h1>
+        <form onsubmit="submitForm(event)">
+            <textarea name="text" rows="4" cols="50" placeholder="Enter your text here"></textarea>
+            <br>
+            <input type="submit" value="Predict">
+        </form>
 
-    {% if predictions %}
-        <h2>Predictions:</h2>
-        <ul>
-            {% for tag, score in predictions.items() %}
-                <li>{{ tag }}: {{ score }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        <div class="error"></div>
+        <div class="predictions"></div>
+    </div>
 </body>
 </html>
-
 
