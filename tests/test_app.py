@@ -16,6 +16,11 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.decode(), "Model loaded successfully!")
 
+    def test_predict(self):
+        response = self.app.post('/predict', json={'text': 'How to train a neural network?'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' not in response.json)
+
 if __name__ == "__main__":
     unittest.main()
 
